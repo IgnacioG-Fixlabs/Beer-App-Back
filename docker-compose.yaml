@@ -1,0 +1,38 @@
+
+version: '3.8'
+
+services:
+  beerapp:
+    depends_on:
+      - db
+      - redis
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: beerapp
+    container_name: beerapp
+    restart: always
+    ports:
+      - "${PORT}:${PORT}"
+    environment:
+      MONGODB: ${MONGODB}
+      PORT: ${PORT}
+  db:
+    image: mongo:7.0
+    container_name: mongo-db
+    restart: always
+    ports:
+      - 27017:27017
+    environment:
+      MONGODB_DATABASE: beer-app
+    volumes:
+      - ./mongo:/data/db
+  redis:
+    image: redis:latest
+    ports:
+      - '6379:6379'
+    command: redis-server --loglevel warning
+    volumes:
+      - cache:/data
+volumes:
+  cache:
